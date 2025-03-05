@@ -1,0 +1,33 @@
+name: Distribute Tokens
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+
+jobs:
+  distribute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Solana
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16  # Or your preferred Node.js version
+
+      - name: Install Solana CLI
+        run: |
+          npm install -g @solana/cli
+          solana config set --keypair ~/.config/solana/id.json  # Configure Solana CLI with your keypair (ensure this file exists securely)
+          solana config set --url mainnet-beta #Or your preferred network
+
+      - name: Install dependencies (if any)
+        run: npm install # If you have dependencies, install them here
+
+      - name: Distribute Tokens
+        run: bash distribute_tokens.sh # Execute the token distribution script
+        env:
+          WALLET: ${{ secrets.SOLANA_WALLET }} # Use a secret for your wallet key
+          RECIPIENT_1: ${{ secrets.RECIPIENT_1 }} # Recipient 1 address
+          RECIPIENT_2: ${{ secrets.RECIPIENT_2 }} # Recipient 2 address
